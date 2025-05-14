@@ -1,4 +1,4 @@
-﻿using IdentityServer.Dtos;
+﻿
 using User.Grpc.Protos;
 
 namespace IdentityServer.GrpcService
