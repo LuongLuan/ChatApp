@@ -1,36 +1,84 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using User.Api.Errors;
+using User.Api.GrpcService;
+using User.Grpc.Protos;
 
-namespace User.Api
+string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+
+builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// validation error reponse
+builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
-    public class Program
+    options.InvalidModelStateResponseFactory = actionContext =>
     {
-        public static void Main(string[] args)
+        var errors = actionContext.ModelState
+            .Where(e => e.Value.Errors.Count > 0)
+            .SelectMany(x => x.Value.Errors)
+            .Select(x => x.ErrorMessage).ToArray();
+
+        var errorResponse = new ApiValidationErrorResponse
         {
-            var builder = WebApplication.CreateBuilder(args);
+            Errors = errors
+        };
 
-            // Add services to the container.
+        return new BadRequestObjectResult(errorResponse);
+    };
+});
 
-            builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      builder =>
+                      {
+                          builder.WithOrigins("http://localhost:4200")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
+                      });
+});
 
-            var app = builder.Build();
+builder.Services.AddScoped<UserGrpcService>();
+builder.Services.AddGrpcClient<UserProtoService.UserProtoServiceClient>
+    (o => o.Address = new Uri(builder.Configuration["GrpcSettings:UserUrl"]));
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.RequireHttpsMetadata = false;
+        options.Authority = builder.Configuration["IdentityServer:BaseUrl"]; //url Identity Server
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateAudience = false,
+            ValidateIssuer = false// fix 401 response in docker
+        };
+    });
 
-            app.UseHttpsRedirection();
+var app = builder.Build();
 
-            app.UseAuthorization();
-
-
-            app.MapControllers();
-
-            app.Run();
-        }
-    }
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+
+app.UseCors(MyAllowSpecificOrigins);
+
+//--publish app----
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.Run();
