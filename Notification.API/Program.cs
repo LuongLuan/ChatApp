@@ -1,36 +1,100 @@
+using EventBus.Messages.Common;
+using MassTransit;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Notification.Api.Services;
+using Notification.API.EventBusConsumer;
+using Notification.API.Middleware;
+using Notification.Application;
+using Notification.Infrastructure;
+using Notification.Infrastructure.Persistence;
 
-namespace Notification.API
+string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+
+builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddTransient<IIdentityService, IdentityService>();
+builder.Services.AddApplicationServices();
+builder.Services.AddInfrastructureServices(builder.Configuration);
+
+builder.Services.AddScoped<AddNotificationConsumer>();
+
+// MassTransit-RabbitMQ Configuration
+builder.Services.AddMassTransit(config => {
+    // neu service nao lang nghe thi them dong nay
+    config.AddConsumer<AddNotificationConsumer>();
+    config.UsingRabbitMq((ctx, cfg) => {
+        cfg.Host(builder.Configuration["EventBusSettings:HostAddress"]);
+        //cfg.UseHealthCheck(ctx);
+        // va dong nay
+        cfg.ReceiveEndpoint(EventBusConstants.AddNotificationQueue, c => {
+            c.ConfigureConsumer<AddNotificationConsumer>(ctx);
+        });
+    });
+});
+
+builder.Services.AddCors(options =>
 {
-    public class Program
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      builder =>
+                      {
+                          builder.WithOrigins("http://localhost:4200")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
+                      });
+});
+
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
     {
-        public static void Main(string[] args)
+        options.RequireHttpsMetadata = false;
+        options.Authority = builder.Configuration["IdentityServer:BaseUrl"]; //url Identity Server
+        options.TokenValidationParameters = new TokenValidationParameters
         {
-            var builder = WebApplication.CreateBuilder(args);
+            ValidateAudience = false,
+            ValidateIssuer = false// fix 401 response in docker, dont check iss jwt
+        };
+    });
 
-            // Add services to the container.
+//tuong duong cai nay builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>(); 
+builder.Services.AddHttpContextAccessor();
 
-            builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+var app = builder.Build();
 
-            var app = builder.Build();
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+app.UseMiddleware<ExceptionMiddleware>();
 
-            app.UseHttpsRedirection();
+app.UseCors(MyAllowSpecificOrigins);
 
-            app.UseAuthorization();
+app.UseAuthentication();
+app.UseAuthorization();
 
+app.MapControllers();
 
-            app.MapControllers();
-
-            app.Run();
-        }
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+        await context.Database.MigrateAsync();
+    }
+    catch (Exception ex)
+    {
+        app.Logger.LogError(ex, "An error occurred during migration");
     }
 }
+
+app.Run();
