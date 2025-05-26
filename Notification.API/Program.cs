@@ -26,42 +26,45 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddScoped<AddNotificationConsumer>();
 
 // MassTransit-RabbitMQ Configuration
-builder.Services.AddMassTransit(config => {
-    // neu service nao lang nghe thi them dong nay
-    config.AddConsumer<AddNotificationConsumer>();
-    config.UsingRabbitMq((ctx, cfg) => {
-        cfg.Host(builder.Configuration["EventBusSettings:HostAddress"]);
-        //cfg.UseHealthCheck(ctx);
-        // va dong nay
-        cfg.ReceiveEndpoint(EventBusConstants.AddNotificationQueue, c => {
-            c.ConfigureConsumer<AddNotificationConsumer>(ctx);
-        });
-    });
+builder.Services.AddMassTransit(config =>
+{
+	// neu service nao lang nghe thi them dong nay
+	config.AddConsumer<AddNotificationConsumer>();
+	config.UsingRabbitMq((ctx, cfg) =>
+	{
+		cfg.Host(builder.Configuration["EventBusSettings:HostAddress"]);
+		//cfg.UseHealthCheck(ctx);
+		// va dong nay
+		cfg.ReceiveEndpoint(EventBusConstants.AddNotificationQueue, c =>
+		{
+			c.ConfigureConsumer<AddNotificationConsumer>(ctx);
+		});
+	});
 });
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: MyAllowSpecificOrigins,
-                      builder =>
-                      {
-                          builder.WithOrigins("http://localhost:4200")
-                          .AllowAnyHeader()
-                          .AllowAnyMethod()
-                          .AllowCredentials();
-                      });
+	options.AddPolicy(name: MyAllowSpecificOrigins,
+					  builder =>
+					  {
+						  builder.WithOrigins("http://localhost:4200")
+						  .AllowAnyHeader()
+						  .AllowAnyMethod()
+						  .AllowCredentials();
+					  });
 });
 
 builder.Services.AddAuthentication("Bearer")
-    .AddJwtBearer("Bearer", options =>
-    {
-        options.RequireHttpsMetadata = false;
-        options.Authority = builder.Configuration["IdentityServer:BaseUrl"]; //url Identity Server
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateAudience = false,
-            ValidateIssuer = false// fix 401 response in docker, dont check iss jwt
-        };
-    });
+	.AddJwtBearer("Bearer", options =>
+	{
+		options.RequireHttpsMetadata = false;
+		options.Authority = builder.Configuration["IdentityServer:BaseUrl"]; //url Identity Server
+		options.TokenValidationParameters = new TokenValidationParameters
+		{
+			ValidateAudience = false,
+			ValidateIssuer = false// fix 401 response in docker, dont check iss jwt
+		};
+	});
 
 //tuong duong cai nay builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>(); 
 builder.Services.AddHttpContextAccessor();
@@ -71,8 +74,8 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+	app.UseSwagger();
+	app.UseSwaggerUI();
 }
 
 app.UseMiddleware<ExceptionMiddleware>();
@@ -86,15 +89,15 @@ app.MapControllers();
 
 using (var scope = app.Services.CreateScope())
 {
-    try
-    {
-        var context = scope.ServiceProvider.GetRequiredService<DataContext>();
-        await context.Database.MigrateAsync();
-    }
-    catch (Exception ex)
-    {
-        app.Logger.LogError(ex, "An error occurred during migration");
-    }
+	try
+	{
+		var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+		await context.Database.MigrateAsync();
+	}
+	catch (Exception ex)
+	{
+		app.Logger.LogError(ex, "An error occurred during migration");
+	}
 }
 
 app.Run();

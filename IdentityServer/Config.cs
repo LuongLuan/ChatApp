@@ -1,7 +1,9 @@
-﻿using IdentityModel;
-using IdentityServer4.Models;
-using IdentityServer4.Test;
-using IdentityServer4;
+﻿
+
+using Duende.IdentityServer;
+using Duende.IdentityServer.Models;
+using Duende.IdentityServer.Test;
+using IdentityModel;
 using System.Security.Claims;
 
 namespace IdentityServer

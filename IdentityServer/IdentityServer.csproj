@@ -7,13 +7,14 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Abp.ZeroCore.IdentityServer4" Version="8.4.0" />
+		<PackageReference Include="Duende.IdentityServer" Version="6.2.3" />
 		<PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.2" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<Protobuf Include="..\..\User\User.Grpc\Protos\user.proto" GrpcServices="Client">
+		<Protobuf Include="..\User.Grpc\Protos\user.proto" GrpcServices="Client">
 			<Link>Protos\user.proto</Link>
 		</Protobuf>
 	</ItemGroup>

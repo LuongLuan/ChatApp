@@ -1,6 +1,5 @@
 using IdentityServer;
 using IdentityServer.GrpcService;
-using IdentityServer4;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using User.Grpc.Protos;
 
