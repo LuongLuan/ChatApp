@@ -1,0 +1,17 @@
+{
+  "profiles": {
+    "Docker Compose": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "serviceActions": {
+        "chat.api": "StartDebugging",
+        "post.api": "StartDebugging",
+        "identityserver": "StartDebugging",
+        "notification.api": "StartDebugging",
+        "user.api": "StartDebugging",
+        "user.grpc": "StartDebugging",
+        "ocelotapigw": "StartDebugging"
+      }
+    }
+  }
+}

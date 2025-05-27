@@ -1,0 +1,106 @@
+
+services:
+## Post database 
+  sqlserver: # This is the service name
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: sqlserver_container # <--- This is where it's set
+    ports:
+      - "1433:1433"
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "P@ssword1"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    restart: unless-stopped
+
+  mysql: # This is the name of your service (you can pick anything)
+    image: mysql:8.0 # The database image to use (MySQL 8.0)
+    container_name: mydb_container # <--- This is where it's set
+    ports:
+      - "3306:3306" # Map host port 3306 to container port 3306
+    environment:
+      MYSQL_ROOT_PASSWORD: "P@ssword1" # ***CHANGE THIS PASSWORD!***
+    volumes:
+      - mysql_data:/var/lib/mysql # Store data permanently in a named volume
+
+  postgres:
+    image: postgres:16-alpine # Using a lightweight PostgreSQL 16 image
+    container_name: my_postgres_db
+    ports:
+      - "5432:5432" # Map host port 5432 to container port 5432
+    environment:
+      POSTGRES_DB: ChatDb # Optional: default database to create
+      POSTGRES_USER: myuser # Optional: default user to create
+      POSTGRES_PASSWORD: P@ssword1 # <--- IMPORTANT: Change this!
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Persist data to a named volume
+
+  redis:
+    image: redis:7.2.5-alpine # Or redis:latest, redis:6.2-alpine, etc.
+    container_name: redis_container
+    ports:
+      - "6379:6379" # Map host port 6379 to container port 6379
+    volumes:
+      - redis_data:/data # Persist Redis data (RDB file, AOF file)
+    command: redis-server --appendonly yes # Ensure data persistence is enabled (AOF)
+    restart: unless-stopped 
+
+  chat.api:
+    image: ${DOCKER_REGISTRY-}chatapi
+    build:
+      context: .
+      dockerfile: Chat.Api/Dockerfile
+
+  post.api:
+    image: ${DOCKER_REGISTRY-}postapi
+    build:
+      context: .
+      dockerfile: Post.Api/Dockerfile
+
+
+  identityserver:
+    image: ${DOCKER_REGISTRY-}identityserver
+    build:
+      context: .
+      dockerfile: IdentityServer/Dockerfile
+
+
+  notification.api:
+    image: ${DOCKER_REGISTRY-}notificationapi
+    build:
+      context: .
+      dockerfile: Notification.API/Dockerfile
+
+
+  user.api:
+    image: ${DOCKER_REGISTRY-}userapi
+    build:
+      context: .
+      dockerfile: User.Api/Dockerfile
+
+
+  user.grpc:
+    image: ${DOCKER_REGISTRY-}usergrpc
+    build:
+      context: .
+      dockerfile: User.Grpc/Dockerfile
+
+
+  ocelotapigw:
+    image: ${DOCKER_REGISTRY-}ocelotapigw
+    build:
+      context: .
+      dockerfile: ApiGateways/OcelotApiGw/Dockerfile
+
+
+#volumes section
+volumes:
+  sqlserver_data:
+    name: sqlserver_data
+  mysql_data:
+    name: mysql_data
+  postgres_data:
+    name: postgres_data
+  redis_data:
+    name: redis_data
+    

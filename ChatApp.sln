@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35122.118
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApiGetWays", "ApiGetWays", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApiGateways", "ApiGateways", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildingBlocks", "BuildingBlocks", "{6A3CA002-41C3-49B5-826B-440EA28A7434}"
 EndProject
@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventBus.Messages", "EventB
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chat.Api", "Chat.Api\Chat.Api.csproj", "{EDEEC4E6-33FC-9021-049D-D93475DB98D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServer", "IdentityServer\IdentityServer.csproj", "{AF5BEFDA-28AE-7603-040D-593562AC6BD5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer", "IdentityServer\IdentityServer.csproj", "{AF5BEFDA-28AE-7603-040D-593562AC6BD5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Notification.API", "Notification.API\Notification.API.csproj", "{AEE16E1D-7A45-E09C-6093-C980F0A16CD8}"
 EndProject
@@ -46,6 +46,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "User.Api", "User.Api\User.Api.csproj", "{8856A0DA-D97A-C770-843F-71486383EDD9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "User.Grpc", "User.Grpc\User.Grpc.csproj", "{B4E18FBC-B452-6AEB-C415-C29E563E129A}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{45121C39-8F5B-4209-81E0-BD960BE3A96A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -105,6 +107,10 @@ Global
 		{B4E18FBC-B452-6AEB-C415-C29E563E129A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B4E18FBC-B452-6AEB-C415-C29E563E129A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B4E18FBC-B452-6AEB-C415-C29E563E129A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45121C39-8F5B-4209-81E0-BD960BE3A96A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45121C39-8F5B-4209-81E0-BD960BE3A96A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45121C39-8F5B-4209-81E0-BD960BE3A96A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45121C39-8F5B-4209-81E0-BD960BE3A96A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
