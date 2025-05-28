@@ -24,6 +24,7 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\EventBus.Messagest\EventBus.Messages.csproj" />
 	  <ProjectReference Include="..\Post.Core\Post.Core.csproj" />
+	  <ProjectReference Include="..\Post.Infrastructure\Post.Infrastructure.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<Protobuf Include="..\User.Grpc\Protos\user.proto" GrpcServices="Client">

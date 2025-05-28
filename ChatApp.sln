@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35122.118
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApiGetWays", "ApiGetWays", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApiGateways", "ApiGateways", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildingBlocks", "BuildingBlocks", "{6A3CA002-41C3-49B5-826B-440EA28A7434}"
 EndProject
@@ -19,33 +19,35 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notification", "Notificatio
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SocialNetworkMicroservices", "SocialNetworkMicroservices", "{93E167E1-D727-4F96-9E35-6B0C4D240EC0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OcelotApiGw", "ApiGateways\OcelotApiGw\OcelotApiGw.csproj", "{4105B185-0216-8F7A-5738-252A8CC322E4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OcelotApiGw", "ApiGateways\OcelotApiGw\OcelotApiGw.csproj", "{4105B185-0216-8F7A-5738-252A8CC322E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventBus.Messages", "EventBus.Messagest\EventBus.Messages.csproj", "{6B061914-43AA-AF1D-D14C-89020E9C0E29}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventBus.Messages", "EventBus.Messagest\EventBus.Messages.csproj", "{6B061914-43AA-AF1D-D14C-89020E9C0E29}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chat.Api", "Chat.Api\Chat.Api.csproj", "{EDEEC4E6-33FC-9021-049D-D93475DB98D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chat.Api", "Chat.Api\Chat.Api.csproj", "{EDEEC4E6-33FC-9021-049D-D93475DB98D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServer", "IdentityServer\IdentityServer.csproj", "{AF5BEFDA-28AE-7603-040D-593562AC6BD5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer", "IdentityServer\IdentityServer.csproj", "{AF5BEFDA-28AE-7603-040D-593562AC6BD5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notification.API", "Notification.API\Notification.API.csproj", "{AEE16E1D-7A45-E09C-6093-C980F0A16CD8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Notification.API", "Notification.API\Notification.API.csproj", "{AEE16E1D-7A45-E09C-6093-C980F0A16CD8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notification.Application", "Notification.Application\Notification.Application.csproj", "{07E17647-BB0B-F423-0C26-A66A8B09F264}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Notification.Application", "Notification.Application\Notification.Application.csproj", "{07E17647-BB0B-F423-0C26-A66A8B09F264}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notification.Domain", "Notification.Domain\Notification.Domain.csproj", "{749A6257-2CE3-A72B-4316-67BEA5DC3F32}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Notification.Domain", "Notification.Domain\Notification.Domain.csproj", "{749A6257-2CE3-A72B-4316-67BEA5DC3F32}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notification.Infrastructure", "Notification.Infrastructure\Notification.Infrastructure.csproj", "{B5C26F80-4533-A0F1-AE86-9C6A925B296B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Notification.Infrastructure", "Notification.Infrastructure\Notification.Infrastructure.csproj", "{B5C26F80-4533-A0F1-AE86-9C6A925B296B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Post.Api", "Post.Api\Post.Api.csproj", "{0BB67BD2-AD2E-32C5-770B-11A84ECD4A19}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Post.Api", "Post.Api\Post.Api.csproj", "{0BB67BD2-AD2E-32C5-770B-11A84ECD4A19}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Post.Core", "Post.Core\Post.Core.csproj", "{384E22F0-33EB-A16B-A34E-9C2555B73EEC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Post.Core", "Post.Core\Post.Core.csproj", "{384E22F0-33EB-A16B-A34E-9C2555B73EEC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Post.Infrastructure", "Post.Infrastructure\Post.Infrastructure.csproj", "{5A4346F3-FE1E-0F81-16B0-027050F2F82D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Post.Infrastructure", "Post.Infrastructure\Post.Infrastructure.csproj", "{5A4346F3-FE1E-0F81-16B0-027050F2F82D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "User", "User", "{BCB07628-CF17-4700-82AD-1FDC7D4C5E8B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "User.Api", "User.Api\User.Api.csproj", "{8856A0DA-D97A-C770-843F-71486383EDD9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "User.Api", "User.Api\User.Api.csproj", "{8856A0DA-D97A-C770-843F-71486383EDD9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "User.Grpc", "User.Grpc\User.Grpc.csproj", "{B4E18FBC-B452-6AEB-C415-C29E563E129A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "User.Grpc", "User.Grpc\User.Grpc.csproj", "{B4E18FBC-B452-6AEB-C415-C29E563E129A}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{45121C39-8F5B-4209-81E0-BD960BE3A96A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -105,6 +107,10 @@ Global
 		{B4E18FBC-B452-6AEB-C415-C29E563E129A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B4E18FBC-B452-6AEB-C415-C29E563E129A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B4E18FBC-B452-6AEB-C415-C29E563E129A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45121C39-8F5B-4209-81E0-BD960BE3A96A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45121C39-8F5B-4209-81E0-BD960BE3A96A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45121C39-8F5B-4209-81E0-BD960BE3A96A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45121C39-8F5B-4209-81E0-BD960BE3A96A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
