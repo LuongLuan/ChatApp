@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EventBus.Messages.Events
 {
-    public class NotificationEvent
+    public class NotificationEvent : IntegrationBaseEvent
     {
         public string UserNameNhan { get; set; } = null!;
         public string UserNameComment { get; set; } = null!;
