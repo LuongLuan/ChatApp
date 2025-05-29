@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Duende.IdentityServer.Extensions;
-using IdentityModel;
+using Duende.IdentityModel;
 
 namespace IdentityServerHost.Quickstart.UI
 {
@@ -347,8 +347,9 @@ namespace IdentityServerHost.Quickstart.UI
                 var idp = User.FindFirst(JwtClaimTypes.IdentityProvider)?.Value;
                 if (idp != null && idp != IdentityServerConstants.LocalIdentityProvider)
                 {
-                    var providerSupportsSignout = await HttpContext.GetSchemeSupportsSignOutAsync(idp);
-                    if (providerSupportsSignout)
+					var provider = HttpContext.RequestServices.GetRequiredService<IAuthenticationHandlerProvider>();
+					var providerSupportsSignout = await provider.GetHandlerAsync(HttpContext, idp);
+                    if (providerSupportsSignout is IAuthenticationSignOutHandler)
                     {
                         if (vm.LogoutId == null)
                         {

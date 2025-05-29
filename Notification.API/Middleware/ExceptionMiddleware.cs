@@ -16,7 +16,7 @@ namespace Notification.API.Middleware
             _env = env;
         }
 
-        public async void Invoke(HttpContext context)
+        public async Task InvokeAsync(HttpContext context)
         {
             try
             {

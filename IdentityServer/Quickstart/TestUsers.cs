@@ -2,9 +2,9 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
+using Duende.IdentityModel;
 using Duende.IdentityServer;
 using Duende.IdentityServer.Test;
-using IdentityModel;
 using System.Security.Claims;
 using System.Text.Json;
 
