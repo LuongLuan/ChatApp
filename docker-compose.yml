@@ -32,6 +32,15 @@ services:
       POSTGRES_DB: postgres # Optional: default database to create
       POSTGRES_PASSWORD: 1234 # <--- IMPORTANT: Change this!
 
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
   redis:
     image: redis:7.2.5-alpine # Or redis:latest, redis:6.2-alpine, etc.
     container_name: redis_container
@@ -113,6 +122,8 @@ volumes:
     name: mysql_data
   postgres_data:
     name: postgres_data
+  mongo_data:
+    name: mongo_data
   redis_data:
     name: redis_data
     
