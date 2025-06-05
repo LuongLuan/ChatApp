@@ -24,16 +24,13 @@ services:
       - mysql_data:/var/lib/mysql # Store data permanently in a named volume
 
   postgres:
-    image: postgres:16-alpine # Using a lightweight PostgreSQL 16 image
+    image: postgres:15-alpine # Using a lightweight PostgreSQL 16 image
     container_name: my_postgres_db
     ports:
       - "5432:5432" # Map host port 5432 to container port 5432
     environment:
-      POSTGRES_DB: ChatDb # Optional: default database to create
-      POSTGRES_USER: myuser # Optional: default user to create
-      POSTGRES_PASSWORD: P@ssword1 # <--- IMPORTANT: Change this!
-    volumes:
-      - postgres_data:/var/lib/postgresql/data # Persist data to a named volume
+      POSTGRES_DB: postgres # Optional: default database to create
+      POSTGRES_PASSWORD: 1234 # <--- IMPORTANT: Change this!
 
   redis:
     image: redis:7.2.5-alpine # Or redis:latest, redis:6.2-alpine, etc.
@@ -92,6 +89,21 @@ services:
       context: .
       dockerfile: ApiGateways/OcelotApiGw/Dockerfile
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"     # RabbitMQ messaging port
+      - "15672:15672"   # RabbitMQ management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - rabbitmq_net
+# Define a custom network for RabbitMQ to avoid conflicts with other services
+networks:
+  rabbitmq_net:
+    driver: bridge
 
 #volumes section
 volumes:
