@@ -1,75 +1,129 @@
 
 services:
+#db configuration
+  postdb:
+    container_name: sqlserver_container 
+    ports:
+      - "1433:1433"
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "P@ssword1"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    restart: unless-stopped
+
+  notificationdb:
+    container_name: mydb_container 
+    ports:
+      - "3306:3306" 
+    environment:
+      MYSQL_ROOT_PASSWORD: "P@ssword1" 
+    volumes:
+      - mysql_data:/var/lib/mysql 
+
+  userdb:
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  chatdb:
+    container_name: my_postgres_db
+    ports:
+      - "5432:5432" 
+    environment:
+      POSTGRES_DB: postgres 
+      POSTGRES_PASSWORD: 1234 
+
+  rediscache:
+    container_name: redis_container
+    ports:
+      - "6379:6379" # Map host port 6379 to container port 6379
+    volumes:
+      - redis_data:/data # Persist Redis data (RDB file, AOF file)
+    command: redis-server --appendonly yes # Ensure data persistence is enabled (AOF)
+    restart: unless-stopped 
+
+# end configuration
+
   chat.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
+      - Kestrel__Endpoints__HTTP__Url=http://0.0.0.0:80
     depends_on:
       - chatdb
       - rabbitmq
     ports:
-      - "5005:80"
+      - "6003:80"
 
   post.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
+      - "ConnectionStrings:DefaultConnection=Server=postdb;Database=PostDb;User ID=sa;Password=P@ssword1;"
+      - "GrpcSettings:UserUrl=http://user.grpc"
+      - "IdentityServer:BaseUrl=http://identityserver"
+      - "EventBusSettings:HostAddress=amqp://guest:guest@rabbitmq:5672"
+      - Kestrel__Endpoints__HTTP__Url=http://0.0.0.0:80
     depends_on:
       - postdb
       - rabbitmq
     ports:
-      - "5003:80"
+      - "6004:80"
 
 
   identityserver:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
+      - "GrpcSettings:UserUrl=http://user.grpc"
+      - Kestrel__Endpoints__HTTP__Url=http://0.0.0.0:80
     ports:
-      - "5077:80"
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - "6005:80"
 
   notification.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
+      - "ConnectionStrings:DefaultConnection=server=notificationdb;Port=3306;Database=NotificationDb;Uid=root;Pwd=P@ssword1;"
+      - "IdentityServer:BaseUrl=http://identityserver"
+      - "EventBusSettings:HostAddress=amqp://guest:guest@rabbitmq:5672"
+      - Kestrel__Endpoints__HTTP__Url=http://0.0.0.0:80
     depends_on:
       - notificationdb
       - rabbitmq
     ports:
-      - "5006:80"
+      - "6006:80"
 
 
   user.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
+      - "GrpcSettings:UserUrl=http://user.grpc"
+      - "IdentityServer:BaseUrl=http://identityserver" 
+      - Kestrel__Endpoints__HTTP__Url=http://0.0.0.0:80
     ports:
-      - "5001:80"
+      - "6001:80"
 
 
   user.grpc:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
+      - "UserStoreDatabase:ConnectionString=mongodb://userdb:27017"
+      - Kestrel__Endpoints__HTTP__Url=http://0.0.0.0:80
+    depends_on:
+      - userdb
     ports:
-      - "5002:80"
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - "6002:80"
 
   ocelotapigw:
+    container_name: ocelotapigw
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
+    depends_on:
+      - user.api
+      - post.api
+      - notification.api
+      - chat.api
     ports:
-      - "8080"
-      - "8081"
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - "6065:80"
+    

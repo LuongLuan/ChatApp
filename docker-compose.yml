@@ -1,55 +1,20 @@
 
 services:
 ## Post database 
-  sqlserver: # This is the service name
+  postdb:
     image: mcr.microsoft.com/mssql/server:2019-latest
-    container_name: sqlserver_container # <--- This is where it's set
-    ports:
-      - "1433:1433"
-    environment:
-      ACCEPT_EULA: "Y"
-      SA_PASSWORD: "P@ssword1"
-    volumes:
-      - sqlserver_data:/var/opt/mssql
-    restart: unless-stopped
 
-  mysql: # This is the name of your service (you can pick anything)
-    image: mysql:8.0 # The database image to use (MySQL 8.0)
-    container_name: mydb_container # <--- This is where it's set
-    ports:
-      - "3306:3306" # Map host port 3306 to container port 3306
-    environment:
-      MYSQL_ROOT_PASSWORD: "P@ssword1" # ***CHANGE THIS PASSWORD!***
-    volumes:
-      - mysql_data:/var/lib/mysql # Store data permanently in a named volume
+  notificationdb:
+    image: mysql:8.0 
 
-  postgres:
-    image: postgres:15-alpine # Using a lightweight PostgreSQL 16 image
-    container_name: my_postgres_db
-    ports:
-      - "5432:5432" # Map host port 5432 to container port 5432
-    environment:
-      POSTGRES_DB: postgres # Optional: default database to create
-      POSTGRES_PASSWORD: 1234 # <--- IMPORTANT: Change this!
+  chatdb:
+    image: postgres:15-alpine 
 
-  mongodb:
+  userdb:
     image: mongo
-    container_name: mongodb
-    restart: always
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-
-  redis:
-    image: redis:7.2.5-alpine # Or redis:latest, redis:6.2-alpine, etc.
-    container_name: redis_container
-    ports:
-      - "6379:6379" # Map host port 6379 to container port 6379
-    volumes:
-      - redis_data:/data # Persist Redis data (RDB file, AOF file)
-    command: redis-server --appendonly yes # Ensure data persistence is enabled (AOF)
-    restart: unless-stopped 
+    
+  rediscache:
+    image: redis:7.2.5-alpine 
 
   chat.api:
     image: ${DOCKER_REGISTRY-}chatapi
