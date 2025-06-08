@@ -41,11 +41,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     options.Cookie.IsEssential = true;
 });*/
-
+var userUrl = builder.Configuration["GrpcSettings:UserUrl"];
 builder.Services.AddScoped<UserGrpcService>();
 builder.Services.AddGrpcClient<UserProtoService.UserProtoServiceClient>
     (o => o.Address = new Uri(builder.Configuration["GrpcSettings:UserUrl"]));
-
 var app = builder.Build();
 
 app.UseDefaultFiles();
