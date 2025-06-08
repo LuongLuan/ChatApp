@@ -72,11 +72,12 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
-    networks:
-      - rabbitmq_net
-# Define a custom network for RabbitMQ to avoid conflicts with other services
+
+# configs net network
+  
 networks:
-  rabbitmq_net:
+  default:
+    name: chat-app
     driver: bridge
 
 #volumes section
