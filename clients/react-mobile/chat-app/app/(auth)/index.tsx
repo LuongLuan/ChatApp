@@ -1,209 +1,307 @@
-// app/auth.tsx
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
-import { useRouter } from 'expo-router'; // Import useRouter để điều hướng
-import React, { useState } from 'react';
-import {
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Để lưu trữ token
+import * as AuthSession from 'expo-auth-session';
+import { useRouter } from 'expo-router'; // Nếu bạn đang dùng Expo Router
+import * as WebBrowser from 'expo-web-browser';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, Button, StyleSheet, Text, View } from 'react-native';
 
-const API_BASE_URL = 'http://localhost:6001';
+// Đảm bảo trình duyệt web được đóng khi hoàn tất phiên xác thực
+WebBrowser.maybeCompleteAuthSession();
 
-const AuthScreen: React.FC = () => {
-  const [isLoginMode, setIsLoginMode] = useState<boolean>(true);
-  const lat : number = 10.77164210569993;
-  const long : number = 106.65039878023639;
-  const [password, setPassword] = useState<string>('');
-  const [username, setUsername] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false); 
-
-  const router = useRouter(); 
-
-  const handleAuth = async () => {
-    setIsLoading(true); 
-    try {
-      let url: string;
-      let body: {};
-
-      if (isLoginMode) {
-        url = `${API_BASE_URL}/api/user/login`; 
-        body = { username, password};
-      } else {
-        url = `${API_BASE_URL}/api/auth/register`; // Giả sử endpoint đăng ký
-        body = { username, password };
-      }
-
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Kiểm tra xem phản hồi có chứa token hay không
-        if (data.token) { // Giả sử backend trả về { token: "..." }
-          await AsyncStorage.setItem('userToken', data.token); // Lưu token vào AsyncStorage
-          console.log('Xác thực thành công, token đã lưu:', data.token);
-          // Điều hướng người dùng đến màn hình chính của ứng dụng
-          router.replace('/(tabs)'); // Điều hướng thay thế, không cho quay lại màn hình auth
-        } else {
-          Alert.alert('Lỗi', 'Không nhận được token từ máy chủ.');
-          console.error('Phản hồi từ API không chứa token:', data);
-        }
-      } else {
-        // Xử lý lỗi từ backend (ví dụ: thông tin đăng nhập sai, email đã tồn tại)
-        const errorMessage = data.message || 'Đã xảy ra lỗi trong quá trình xác thực.';
-        Alert.alert('Lỗi xác thực', errorMessage);
-        console.error('Lỗi API:', response.status, data);
-      }
-    } catch (error) {
-      console.error('Lỗi khi gọi API:', error);
-      Alert.alert('Lỗi kết nối', 'Không thể kết nối đến máy chủ. Vui lòng thử lại sau.');
-    } finally {
-      setIsLoading(false); // Kết thúc loading
-    }
-  };
-
-  return (
-    <KeyboardAvoidingView
-      style={styles.screen}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        <View style={styles.authContainer}>
-          <Text style={styles.title}>{isLoginMode ? 'Đăng nhập' : 'Đăng ký'}</Text>
-
-          {!isLoginMode && (
-            <TextInput
-              style={styles.input}
-              placeholder="Tên người dùng"
-              placeholderTextColor="#ccc"
-              value={username}
-              onChangeText={setUsername}
-              autoCapitalize="none"
-              editable={!isLoading} // Không cho chỉnh sửa khi đang tải
-            />
-          )}
-
-          <TextInput
-            style={styles.input}
-            placeholder="Tên người dùng hoặc Email" // Cập nhật placeholder
-            placeholderTextColor="#ccc"
-            keyboardType="email-address" // Vẫn giữ keyboardType email để tiện
-            autoCapitalize="none"
-            value={email}
-            onChangeText={setEmail}
-            editable={!isLoading}
-          />
-
-          <TextInput
-            style={styles.input}
-            placeholder="Mật khẩu"
-            placeholderTextColor="#ccc"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-            editable={!isLoading}
-          />
-
-          <TouchableOpacity
-            style={[styles.button, isLoading && styles.buttonDisabled]} // Thêm style khi disabled
-            onPress={handleAuth}
-            disabled={isLoading} // Tắt nút khi đang tải
-          >
-            <Text style={styles.buttonText}>
-              {isLoading ? 'Đang xử lý...' : (isLoginMode ? 'Đăng nhập' : 'Đăng ký')}
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.switchButton}
-            onPress={() => setIsLoginMode((prevMode) => !prevMode)}
-            disabled={isLoading} // Tắt nút khi đang tải
-          >
-            <Text style={styles.switchButtonText}>
-              {isLoginMode ? 'Chưa có tài khoản? Đăng ký' : 'Đã có tài khoản? Đăng nhập'}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
-  );
+// Cấu hình Duende IdentityServer của bạn
+const discovery = {
+  authorizationEndpoint: 'http://localhost:5077/connect/authorize',
+  tokenEndpoint: 'http://localhost:5077/connect/token',
+  revocationEndpoint: 'http://localhost:5077/connect/revocation',
+  userinfoEndpoint: 'http://localhost:5077/connect/userinfo',
 };
 
+const clientId = 'expo-mobile-app'; // ClientId phải khớp với cấu hình trong Duende IdentityServer
+
+// Tạo URI chuyển hướng tự động, phù hợp với Expo Go và build app
+const redirectUri = AuthSession.makeRedirectUri({
+  scheme: 'chatapp',
+  path: '(tabs)',
+});
+
+console.log('Redirect URI cho ứng dụng của bạn:', redirectUri); // In ra để kiểm tra
+
+export default function AuthScreen() {
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [refreshToken, setRefreshToken] = useState<string | null>(null);
+  const [idToken, setIdToken] = useState<string | null>(null);
+  const [userInfo, setUserInfo] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const router = useRouter();
+
+  // Sử dụng useAuthRequest hook từ expo-auth-session
+  const [request, response, promptAsync] = AuthSession.useAuthRequest(
+    {
+      clientId: clientId,
+      redirectUri: redirectUri,
+      scopes: ['openid', 'profile', 'email', 'roles', 'userAPI', 'chatAPI', 'offline_access'],
+      usePKCE: true, // Mặc định là true cho luồng code, nhưng nên đặt rõ ràng
+    },
+    discovery
+  );
+
+  // Hàm để lấy thông tin người dùng từ userinfo endpoint
+  const fetchUserInfo = useCallback(async (token: string) => {
+    if (!discovery.userinfoEndpoint) {
+      console.warn('userinfoEndpoint không được định nghĩa trong cấu hình.');
+      return;
+    }
+    try {
+      const userInfoResponse = await fetch(discovery.userinfoEndpoint, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await userInfoResponse.json();
+      setUserInfo(data);
+      console.log('Thông tin người dùng:', data);
+    } catch (error) {
+      console.error('Lỗi khi lấy thông tin người dùng:', error);
+      Alert.alert('Lỗi', 'Không thể lấy thông tin người dùng.');
+    }
+  }, []); // Không cần discovery.userinfoEndpoint trong dependency vì nó là hằng số
+
+  // Xử lý phản hồi xác thực khi nhận được
+  useEffect(() => {
+    const handleAuthResponse = async () => {
+      if (response?.type === 'success') {
+        setIsLoading(true);
+        const { code } = response.params;
+        console.log('Mã ủy quyền nhận được:', code);
+
+        try {
+          // Đổi mã ủy quyền lấy token (access token, id token, refresh token)
+          const tokenResponse = await AuthSession.exchangeCodeAsync(
+            {
+              clientId: clientId,
+              code: code,
+              redirectUri: redirectUri,
+              extraParams: {
+                code_verifier: request?.codeVerifier || '', // Rất quan trọng cho PKCE
+              },
+            },
+            discovery
+          );
+
+          setAccessToken(tokenResponse.accessToken);
+          setIdToken(tokenResponse.idToken || null);
+          setRefreshToken(tokenResponse.refreshToken || null);
+
+          // Lưu token vào AsyncStorage (sử dụng giải pháp an toàn hơn cho production)
+          await AsyncStorage.setItem('accessToken', tokenResponse.accessToken);
+          if (tokenResponse.idToken) await AsyncStorage.setItem('idToken', tokenResponse.idToken);
+          if (tokenResponse.refreshToken) await AsyncStorage.setItem('refreshToken', tokenResponse.refreshToken);
+
+          Alert.alert('Thành công', 'Đăng nhập thành công!');
+          if (tokenResponse.accessToken) {
+            await fetchUserInfo(tokenResponse.accessToken);
+          }
+          router.replace('/'); 
+        } catch (error: any) {
+          console.error('Lỗi khi đổi mã lấy token:', error);
+          Alert.alert('Lỗi', `Không thể lấy token: ${error.message || 'Lỗi không xác định'}`);
+        } finally {
+          setIsLoading(false);
+        }
+      } else if (response?.type === 'error') {
+        console.error('Lỗi xác thực:', response.error);
+        Alert.alert('Lỗi xác thực', response.error?.message || 'Đã xảy ra lỗi trong quá trình xác thực.');
+      } else if (response?.type === 'cancel') {
+        console.log('Người dùng đã hủy đăng nhập.');
+        Alert.alert('Thông báo', 'Bạn đã hủy đăng nhập.');
+      }
+    };
+
+    handleAuthResponse();
+  }, [response, request, fetchUserInfo]); 
+
+  // Hàm để làm mới token
+  const handleRefresh = useCallback(async () => {
+    if (!refreshToken) {
+      Alert.alert('Lỗi', 'Không có refresh token để làm mới.');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const tokenResponse = await AuthSession.refreshAsync(
+        {
+          clientId: clientId,
+          refreshToken: refreshToken,
+          scopes: ['openid', 'profile', 'api1', 'offline_access'], // Yêu cầu lại các scope
+        },
+        discovery
+      );
+
+      setAccessToken(tokenResponse.accessToken);
+      setIdToken(tokenResponse.idToken || null);
+      setRefreshToken(tokenResponse.refreshToken || null); // Quan trọng: có thể nhận được refresh token mới
+
+      await AsyncStorage.setItem('accessToken', tokenResponse.accessToken);
+      if (tokenResponse.idToken) await AsyncStorage.setItem('idToken', tokenResponse.idToken);
+      if (tokenResponse.refreshToken) await AsyncStorage.setItem('refreshToken', tokenResponse.refreshToken);
+
+      Alert.alert('Thành công', 'Token đã được làm mới!');
+      if (tokenResponse.accessToken) {
+        await fetchUserInfo(tokenResponse.accessToken);
+      }
+    } catch (error: any) {
+      console.error('Lỗi khi làm mới token:', error);
+      Alert.alert('Lỗi', `Không thể làm mới token: ${error.message || 'Lỗi không xác định'}`);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [refreshToken, fetchUserInfo]);
+
+  // Hàm để đăng xuất
+  const handleLogout = useCallback(async () => {
+    if (!accessToken) {
+      Alert.alert('Thông báo', 'Bạn chưa đăng nhập.');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      
+      if (discovery.revocationEndpoint) {
+        await AuthSession.revokeAsync(
+          {
+            token: accessToken,
+            clientId: clientId,
+          },
+          discovery
+        );
+        if (refreshToken) {
+          await AuthSession.revokeAsync(
+            {
+              token: refreshToken,
+              clientId: clientId,
+              tokenTypeHint: AuthSession.TokenTypeHint.RefreshToken,
+            },
+            discovery
+          );
+        }
+      }
+
+      await AsyncStorage.removeItem('accessToken');
+      await AsyncStorage.removeItem('refreshToken');
+      await AsyncStorage.removeItem('idToken');
+
+      setAccessToken(null);
+      setRefreshToken(null);
+      setIdToken(null);
+      setUserInfo(null);
+
+      Alert.alert('Thành công', 'Bạn đã đăng xuất.');
+      router.replace('/'); 
+    } catch (error: any) {
+      console.error('Lỗi khi đăng xuất:', error);
+      Alert.alert('Lỗi', `Không thể đăng xuất: ${error.message || 'Lỗi không xác định'}`);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [accessToken, refreshToken]);
+
+
+  useEffect(() => {
+    const loadStoredTokens = async () => {
+      setIsLoading(true);
+      const storedAccessToken = await AsyncStorage.getItem('accessToken');
+      const storedRefreshToken = await AsyncStorage.getItem('refreshToken');
+      const storedIdToken = await AsyncStorage.getItem('idToken');
+
+      if (storedAccessToken) {
+        setAccessToken(storedAccessToken);
+        setRefreshToken(storedRefreshToken);
+        setIdToken(storedIdToken);
+        await fetchUserInfo(storedAccessToken); 
+        Alert.alert('Thông báo', 'Đã tìm thấy phiên đăng nhập. Chuyển hướng đến màn hình chính.');
+        router.replace('/'); 
+      }
+      setIsLoading(false);
+    };
+
+    loadStoredTokens();
+  }, [fetchUserInfo]); 
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Xác thực với Duende IdentityServer</Text>
+
+      {isLoading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        <>
+          {!accessToken ? (
+            <Button
+              title="Đăng nhập qua Duende IdentityServer"
+              disabled={!request} 
+              onPress={() => {
+                promptAsync(); 
+              }}
+            />
+          ) : (
+            <View style={styles.loggedInContainer}>
+              <Text style={styles.statusText}>Bạn đã đăng nhập thành công!</Text>
+              <Text>Access Token: {accessToken ? 'Có sẵn' : 'Không có'}</Text>
+              <Text>Refresh Token: {refreshToken ? 'Có sẵn' : 'Không có'}</Text>
+              <Text>ID Token: {idToken ? 'Có sẵn' : 'Không có'}</Text>
+              {userInfo && (
+                <View style={styles.userInfoContainer}>
+                  <Text style={styles.userInfoTitle}>Thông tin người dùng:</Text>
+                  {Object.entries(userInfo).map(([key, value]) => (
+                    <Text key={key}>{key}: {JSON.stringify(value)}</Text>
+                  ))}
+                </View>
+              )}
+              <Button title="Làm mới Access Token" onPress={handleRefresh} />
+              <Button title="Đăng xuất" onPress={handleLogout} color="red" />
+            </View>
+          )}
+        </>
+      )}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
-  screen: {
+  container: {
     flex: 1,
-    backgroundColor: '#f0f2f5',
-  },
-  scrollViewContent: {
-    flexGrow: 1,
     justifyContent: 'center',
-     paddingHorizontal: 20, 
-  },
-  authContainer: {
-    width: '100%',     // full chiều ngang
+    alignItems: 'center',
     padding: 20,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
-    alignSelf: 'center',
+    backgroundColor: '#f5f5f5',
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
     color: '#333',
   },
-  input: {
-    height: 50,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    marginBottom: 15,
-    fontSize: 16,
-    color: '#333',
-  },
-  button: {
-    backgroundColor: '#1877f2',
-    paddingVertical: 15,
-    borderRadius: 8,
+  loggedInContainer: {
     alignItems: 'center',
-    marginTop: 10,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  buttonDisabled: { // Style cho nút khi disabled
-    backgroundColor: '#a3d1f0',
-  },
-  switchButton: {
     marginTop: 20,
-    alignItems: 'center',
   },
-  switchButtonText: {
-    color: '#1877f2',
+  statusText: {
+    fontSize: 18,
+    marginVertical: 10,
+    fontWeight: '600',
+    color: 'green',
+  },
+  userInfoContainer: {
+    marginTop: 20,
+    padding: 15,
+    backgroundColor: '#e0e0e0',
+    borderRadius: 8,
+    width: '100%',
+    alignSelf: 'flex-start', 
+  },
+  userInfoTitle: {
     fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
   },
 });
-
-export default AuthScreen;

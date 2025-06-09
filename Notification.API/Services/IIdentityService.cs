@@ -17,7 +17,7 @@ namespace Notification.Api.Services
         }
 
         /// <summary>
-        /// "sub": "hoainam10th", user.grpc subjectId = username
+        
         /// </summary>
         /// <returns></returns>
         public string GetUserIdentity()

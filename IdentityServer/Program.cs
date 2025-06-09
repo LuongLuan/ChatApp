@@ -29,7 +29,7 @@ builder.Services.AddIdentityServer()
     .AddInMemoryApiResources(Config.ApiResources)
     .AddInMemoryApiScopes(Config.ApiScopes)
     .AddInMemoryIdentityResources(Config.IdentityResources)
-//.AddTestUsers(Config.TestUsers)
+.AddTestUsers(Config.TestUsers)
 .AddDeveloperSigningCredential();
 
 // login redict to angular

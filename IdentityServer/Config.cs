@@ -62,17 +62,46 @@ namespace IdentityServer
                     PostLogoutRedirectUris = new List<string>() { "http://localhost:4200" },
                     AllowedCorsOrigins = { "http://localhost:4200" },
                     AllowedScopes = new List<string>()
-                    { 
-                        "openid", 
-                        "profile", 
-                        "address", 
-                        "email", 
-                        "roles", 
-                        "userAPI", 
-                        "postAPI", 
-                        "notificationAPI", 
-                        "chatAPI" 
+                    {
+                        "openid",
+                        "profile",
+                        "address",
+                        "email",
+                        "roles",
+                        "userAPI",
+                        "postAPI",
+                        "notificationAPI",
+                        "chatAPI"
                     }
+                },
+                new Client
+                {
+                    ClientId = "expo-mobile-app",
+                    ClientName = "My Mobile App",
+                    AllowedGrantTypes = GrantTypes.Code,
+                    RequirePkce = true,
+                    AllowPlainTextPkce = false, // Always set to false for production
+                    RedirectUris = {
+                        "chatapp://(tabs)", // 
+                        "http://localhost:8081/(tabs)" 
+                    },
+                    PostLogoutRedirectUris = {
+                        "chatapp://(tabs)/about",
+                        "http://localhost:8081/(tabs)/about"
+                    },
+                    AllowedScopes = {
+                        IdentityServerConstants.StandardScopes.OpenId,
+                        IdentityServerConstants.StandardScopes.Profile,
+                        "address",
+                        "email",
+                        "roles",
+                        "userAPI",
+                        "postAPI",
+                        "notificationAPI",
+                        "chatAPI" // To enable refresh tokens
+                    },
+                    AllowOfflineAccess = true,
+                    // No ClientSecret for public clients
                 }
             };
 
@@ -113,12 +142,12 @@ namespace IdentityServer
                 new TestUser
                 {
                     SubjectId = "1234",
-                    Username = "hoainam10th",
+                    Username = "luongvanluan",
                     Password = "123456",
                     Claims = new List<Claim>
                     {
-                        new Claim(JwtClaimTypes.GivenName, "Nam"),
-                        new Claim(JwtClaimTypes.FamilyName, "Nguyen")
+                        new Claim(JwtClaimTypes.GivenName, "luan"),
+                        new Claim(JwtClaimTypes.FamilyName, "luong")
                     }
                 }
             };
