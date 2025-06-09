@@ -81,12 +81,11 @@ namespace IdentityServer
                     AllowedGrantTypes = GrantTypes.Code,
                     RequirePkce = true,
                     AllowPlainTextPkce = false, // Always set to false for production
+                    RequireClientSecret = false,
                     RedirectUris = {
-                        "chatapp://(tabs)", // 
                         "http://localhost:8081/(tabs)" 
                     },
                     PostLogoutRedirectUris = {
-                        "chatapp://(tabs)/about",
                         "http://localhost:8081/(tabs)/about"
                     },
                     AllowedScopes = {

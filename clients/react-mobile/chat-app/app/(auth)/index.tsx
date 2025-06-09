@@ -1,6 +1,6 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Để lưu trữ token
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as AuthSession from 'expo-auth-session';
-import { useRouter } from 'expo-router'; // Nếu bạn đang dùng Expo Router
+import { useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Button, StyleSheet, Text, View } from 'react-native';
@@ -8,7 +8,6 @@ import { ActivityIndicator, Alert, Button, StyleSheet, Text, View } from 'react-
 // Đảm bảo trình duyệt web được đóng khi hoàn tất phiên xác thực
 WebBrowser.maybeCompleteAuthSession();
 
-// Cấu hình Duende IdentityServer của bạn
 const discovery = {
   authorizationEndpoint: 'http://localhost:5077/connect/authorize',
   tokenEndpoint: 'http://localhost:5077/connect/token',
@@ -16,15 +15,12 @@ const discovery = {
   userinfoEndpoint: 'http://localhost:5077/connect/userinfo',
 };
 
-const clientId = 'expo-mobile-app'; // ClientId phải khớp với cấu hình trong Duende IdentityServer
+const clientId = 'expo-mobile-app';
 
-// Tạo URI chuyển hướng tự động, phù hợp với Expo Go và build app
 const redirectUri = AuthSession.makeRedirectUri({
   scheme: 'chatapp',
   path: '(tabs)',
 });
-
-console.log('Redirect URI cho ứng dụng của bạn:', redirectUri); // In ra để kiểm tra
 
 export default function AuthScreen() {
   const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -38,7 +34,7 @@ export default function AuthScreen() {
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
       clientId: clientId,
-      redirectUri: redirectUri,
+      redirectUri: "http://localhost:8081/(tabs)",
       scopes: ['openid', 'profile', 'email', 'roles', 'userAPI', 'chatAPI', 'offline_access'],
       usePKCE: true, // Mặc định là true cho luồng code, nhưng nên đặt rõ ràng
     },
@@ -66,7 +62,7 @@ export default function AuthScreen() {
     }
   }, []); // Không cần discovery.userinfoEndpoint trong dependency vì nó là hằng số
 
-  // Xử lý phản hồi xác thực khi nhận được
+ 
   useEffect(() => {
     const handleAuthResponse = async () => {
       if (response?.type === 'success') {
@@ -80,7 +76,7 @@ export default function AuthScreen() {
             {
               clientId: clientId,
               code: code,
-              redirectUri: redirectUri,
+              redirectUri: "http://localhost:8081/(tabs)",
               extraParams: {
                 code_verifier: request?.codeVerifier || '', // Rất quan trọng cho PKCE
               },
