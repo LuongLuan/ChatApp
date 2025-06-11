@@ -76,31 +76,26 @@ namespace IdentityServer
                 },
                 new Client
                 {
-                    ClientId = "expo-mobile-app",
-                    ClientName = "My Mobile App",
+                    ClientId = "react_native_client",
+                    ClientName = "React Native App",
                     AllowedGrantTypes = GrantTypes.Code,
                     RequirePkce = true,
-                    AllowPlainTextPkce = false, // Always set to false for production
-                    RequireClientSecret = false,
-                    RedirectUris = {
-                        "http://localhost:8081/(tabs)" 
-                    },
-                    PostLogoutRedirectUris = {
-                        "http://localhost:8081/(tabs)/about"
-                    },
-                    AllowedScopes = {
-                        IdentityServerConstants.StandardScopes.OpenId,
-                        IdentityServerConstants.StandardScopes.Profile,
+                    RequireClientSecret = false,  // Mobile App => Không cần secret
+                    RedirectUris = { "exp://192.168.x.x:19000" },  // Expo Dev URL hoặc custom scheme
+                    PostLogoutRedirectUris = { "exp://192.168.x.x:19000" },
+                    AllowedScopes = new List<string>()
+                    {
+                        "openid",
+                        "profile",
                         "address",
                         "email",
                         "roles",
                         "userAPI",
                         "postAPI",
                         "notificationAPI",
-                        "chatAPI" // To enable refresh tokens
+                        "chatAPI"
                     },
-                    AllowOfflineAccess = true,
-                    // No ClientSecret for public clients
+                    AllowOfflineAccess = true  // để nhận refresh_token
                 }
             };
 
