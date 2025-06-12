@@ -1,4 +1,4 @@
-import { AuthRepository } from "../../domain/repositories/AuthRepository";
+import { AuthRepository } from "../interfaces/IAuthService";
 
 export class LoginWithIdentityServer {
   constructor(private authRepo: AuthRepository) {}

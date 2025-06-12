@@ -1,7 +1,7 @@
-import { AuthRepository } from '../../domain/repositories/AuthRepository';
+import { IAuthService } from '../../application/interfaces/IAuthService';
 import { exchangeCodeForToken, refreshAccessToken, revokeToken } from '../api/IdentityServerApi';
 
-export class AuthRepositoryImpl implements AuthRepository {
+export class AuthRepositoryImpl implements IAuthService {
   async login(code: string, codeVerifier: string) {
     return await exchangeCodeForToken(code, codeVerifier);
   }
