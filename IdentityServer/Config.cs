@@ -81,8 +81,8 @@ namespace IdentityServer
                     AllowedGrantTypes = GrantTypes.Code,
                     RequirePkce = true,
                     RequireClientSecret = false,  // Mobile App => Không cần secret
-                    RedirectUris = { "exp://192.168.x.x:19000" },  // Expo Dev URL hoặc custom scheme
-                    PostLogoutRedirectUris = { "exp://192.168.x.x:19000" },
+                    RedirectUris = { "exp://172.16.19.185:8081" },  // Expo Dev URL hoặc custom scheme
+                    PostLogoutRedirectUris = { "exp://172.16.19.185:8081/login" },
                     AllowedScopes = new List<string>()
                     {
                         "openid",
