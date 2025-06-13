@@ -1,7 +1,7 @@
-import { IAuthRepository } from '../interfaces/IAuthService';
+import { IAuthService } from '../interfaces/IAuthService';
 
 export class AuthService {
-  constructor(private authRepository: IAuthRepository) {}
+  constructor(private authRepository: IAuthService) {}
 
   /**
    * Đăng nhập bằng authorization code + codeVerifier (PKCE)

@@ -6,7 +6,7 @@ import { ActivityIndicator, Alert, Button, Text, View } from 'react-native';
 import { AuthService } from '../../application/services/AuthService';
 import { AuthRepositoryImpl } from '../../infrastructure/repositories/AuthRepositoryImpl';
 import { TokenStorage } from '../../infrastructure/storage/TokenStorage';
-import { clientId, discovery, redirectUri } from '../../shared/constants/oauthConfig';
+import { clientId, discovery } from '../../shared/constants/oauthConfig';
 
 export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
@@ -29,7 +29,8 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     try {
       setLoading(true);
-console.log("Generated redirectUri:", redirectUri); 
+      const redirectUri = AuthSession.makeRedirectUri();
+      console.log("Generated redirectUri:", redirectUri); 
       const codeVerifier = generateCodeVerifier();
       const codeChallenge = await generateCodeChallenge(codeVerifier);
 
@@ -44,8 +45,9 @@ console.log("Generated redirectUri:", redirectUri);
       const request = new AuthSession.AuthRequest(authRequestConfig);
 
       console.log("create request:" , request);
-      await request.makeAuthUrlAsync(discovery);
 
+      await request.makeAuthUrlAsync(discovery);
+      console.log('get discovery', discovery);
       const result = await request.promptAsync(discovery);
 
       console.log("get result:", result);
