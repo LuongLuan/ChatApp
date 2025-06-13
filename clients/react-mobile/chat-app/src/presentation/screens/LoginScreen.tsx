@@ -1,6 +1,7 @@
 import * as AuthSession from 'expo-auth-session';
 import * as Crypto from 'expo-crypto';
 import { useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import React, { useState } from 'react';
 import { ActivityIndicator, Alert, Button, Text, View } from 'react-native';
 import { AuthService } from '../../application/services/AuthService';
@@ -9,6 +10,9 @@ import { TokenStorage } from '../../infrastructure/storage/TokenStorage';
 import { clientId, discovery } from '../../shared/constants/oauthConfig';
 
 export default function LoginScreen() {
+
+  WebBrowser.maybeCompleteAuthSession();
+
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const authService = new AuthService(new AuthRepositoryImpl());
@@ -29,11 +33,12 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     try {
       setLoading(true);
-      const redirectUri = AuthSession.makeRedirectUri();
+      const redirectUri = "https://auth.expo.io/@your-username/chat-app";
+
       console.log("Generated redirectUri:", redirectUri); 
       const codeVerifier = generateCodeVerifier();
       const codeChallenge = await generateCodeChallenge(codeVerifier);
-
+      
       const authRequestConfig: AuthSession.AuthRequestConfig = {
         clientId,
         redirectUri,
@@ -49,6 +54,8 @@ export default function LoginScreen() {
       await request.makeAuthUrlAsync(discovery);
       console.log('get discovery', discovery);
       const result = await request.promptAsync(discovery);
+
+      await WebBrowser.dismissBrowser();
 
       console.log("get result:", result);
 
