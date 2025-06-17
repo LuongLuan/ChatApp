@@ -7,11 +7,11 @@ import { ActivityIndicator, Alert, Button, Text, View } from 'react-native';
 import { AuthService } from '../../application/services/AuthService';
 import { AuthRepositoryImpl } from '../../infrastructure/repositories/AuthRepositoryImpl';
 import { TokenStorage } from '../../infrastructure/storage/TokenStorage';
-import { clientId, discovery } from '../../shared/constants/oauthConfig';
+import { clientId, discovery, redirectUri } from '../../shared/constants/oauthConfig';
+  
+WebBrowser.maybeCompleteAuthSession();
 
-export default function LoginScreen() {
-
-  WebBrowser.maybeCompleteAuthSession();
+  export default function LoginScreen() {
 
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -33,8 +33,7 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     try {
       setLoading(true);
-      const redirectUri = "https://auth.expo.io/@your-username/chat-app";
-
+      //const redirectUri = AuthSession.makeRedirectUri({scheme:'exp+chat-app'});
       console.log("Generated redirectUri:", redirectUri); 
       const codeVerifier = generateCodeVerifier();
       const codeChallenge = await generateCodeChallenge(codeVerifier);
@@ -44,6 +43,7 @@ export default function LoginScreen() {
         redirectUri,
         scopes: ['openid', 'profile', 'email', "roles","userAPI","postAPI","notificationAPI","chatAPI"],
         responseType: AuthSession.ResponseType.Code,
+        usePKCE: true,
         codeChallenge,
         codeChallengeMethod: AuthSession.CodeChallengeMethod.S256, 
       };

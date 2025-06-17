@@ -76,14 +76,14 @@ namespace IdentityServer
                 },
                 new Client
                 {
+                    Enabled = true,
                     ClientId = "react_native_client",
                     ClientName = "React Native App",
                     AllowedGrantTypes = GrantTypes.Code,
                     RequirePkce = true,
-                    RequireClientSecret = false,  // Mobile App => Không cần secret
-                    RedirectUris = { "https://auth.expo.io/@luongluan/chat-app"
- },  // Expo Dev URL hoặc custom scheme
-                    PostLogoutRedirectUris = { "https://auth.expo.io/@luongluan/chat-app/login" },
+                    RequireClientSecret = false,
+                    RedirectUris = { "exp://192.168.0.101:8081" }, 
+                    PostLogoutRedirectUris = { "exp+chat-app/login" },
                     AllowedScopes = new List<string>()
                     {
                         "openid",
@@ -115,7 +115,7 @@ namespace IdentityServer
                new ApiResource("userAPI", "User API"),
                new ApiResource("postAPI", "Post API"),
                new ApiResource("notificationAPI", "Notification API"),
-               new ApiResource("chatAPI", "Chat API")
+               new ApiResource("chatAPI", "Chat API") 
           };
 
         public static IEnumerable<IdentityResource> IdentityResources =>
