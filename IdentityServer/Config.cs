@@ -115,7 +115,7 @@ namespace IdentityServer
                new ApiResource("userAPI", "User API"),
                new ApiResource("postAPI", "Post API"),
                new ApiResource("notificationAPI", "Notification API"),
-               new ApiResource("chatAPI", "Chat API")
+               new ApiResource("chatAPI", "Chat API") 
           };
 
         public static IEnumerable<IdentityResource> IdentityResources =>
