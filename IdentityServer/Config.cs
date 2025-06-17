@@ -82,7 +82,7 @@ namespace IdentityServer
                     AllowedGrantTypes = GrantTypes.Code,
                     RequirePkce = true,
                     RequireClientSecret = false,
-                    RedirectUris = { "exp://192.168.0.101:8081" }, 
+                    RedirectUris = { "exp://172.16.19.185:8081" }, 
                     PostLogoutRedirectUris = { "exp+chat-app/login" },
                     AllowedScopes = new List<string>()
                     {
