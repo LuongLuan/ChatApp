@@ -50,9 +50,8 @@ export default function LoginScreen() {
       const request = new AuthSession.AuthRequest(authRequestConfig);
 
       console.log("create request:" , request);
-
       await request.makeAuthUrlAsync(discovery);
-      console.log('get discovery', discovery);
+
       const result = await request.promptAsync(discovery);
 
       await WebBrowser.dismissBrowser();

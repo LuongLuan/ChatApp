@@ -12,4 +12,3 @@ export const clientId = 'react_native_client';
 
 // 🔗 Redirect URI (Expo hoặc custom scheme)
 export const redirectUri = 'exp://172.16.19.185:8081';
-//export const redirectUri = "https://auth.expo.dev/@luongluan/chat-app";
